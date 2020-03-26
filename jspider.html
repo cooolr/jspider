@@ -1,0 +1,78 @@
+<html><body><li>小说爬虫，练习js之作，仅支持电脑端<li>开发者模式Console栏可看下载进度</li><li>请忽视下载速度和代码质量 :)</li></body></html>
+
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script>
+function saveShareContent (content, fileName) {
+    //保存内容至本地文件
+    let downLink = document.createElement('a');
+    downLink.download = fileName;
+    //字符内容转换为blod地址
+    let blob = new Blob([content]);
+    downLink.href = URL.createObjectURL(blob);
+    // 链接插入到页面
+    document.body.appendChild(downLink);
+    downLink.click();
+    // 移除下载链接
+    document.body.removeChild(downLink);
+}
+
+let search_url = 'https://www.xsbiquge.com/search.php?keyword='
+let keyword = prompt('请先按F12进入开发者模式并点击Console栏，以便查看下载进度\n\n请输入小说名称', '超级神基因');
+let search_result;
+
+$.ajax({
+    type : "get",
+    url : 'http://111.230.24.37:8000/get?url='+search_url+keyword,
+    async:false,
+    success : function(data) {
+        search_result = data;
+    },
+    error : function(data) {
+      return ;
+    }
+});
+
+let re = new RegExp(' <a cpos="title" href="(.*?)" title="'+keyword+'"');
+let res = re.exec(search_result);
+let keyword_url = res[1];
+
+$.ajax({
+    type : "get",
+    url : 'http://111.230.24.37:8000/get?url='+keyword_url,
+    async:false,
+    success : function(data) {
+        title_result = data;
+    },
+    error : function(data) {
+      return ;
+    }
+});
+
+re = new RegExp('<dd><a href="(.*?)">(.*?)</a></dd>', 'g');
+content_re = new RegExp('<div id="content">(.*?)</div>');
+let body = '';
+
+while (res = re.exec(title_result)){
+    let title_url = res[1];
+    let title = res[2];
+    console.log(title);
+    $.ajax({
+        type : "get",
+        url : 'http://111.230.24.37:8000/get?url='+'https://www.xsbiquge.com'+title_url,
+        async:false,
+        success : function(data) {
+            let text = content_re.exec(data)[1];
+            let sub = new RegExp('&nbsp;', 'g');
+            text = text.replace(sub, ' ');
+            sub = new RegExp('<br />', 'g');
+            text = text.replace(sub, '\n');
+            text = title + '\n\n' + text + '\n\n\n\n';
+            body += text;
+        },
+        error : function(data) {
+          console.log(data);
+        }
+    });
+}
+saveShareContent(body, keyword+'.txt');
+</script>
