@@ -22,7 +22,8 @@ let search_result;
 
 $.ajax({
     type : "get",
-    url : 'http://111.230.24.37:8000/get?url='+search_url+keyword,
+    //url: 'http://111.230.24.37:8000/get?url='+search_url+keyword,
+    url : 'https://111.230.24.37:8443/get?url='+search_url+keyword,
     async:false,
     success : function(data) {
         search_result = data;
@@ -38,7 +39,8 @@ let keyword_url = res[1];
 
 $.ajax({
     type : "get",
-    url : 'http://111.230.24.37:8000/get?url='+keyword_url,
+    //url : 'http://111.230.24.37:8000/get?url='+keyword_url,
+    url : 'https://111.230.24.37:8443/get?url='+keyword_url,
     async:false,
     success : function(data) {
         title_result = data;
@@ -58,7 +60,8 @@ while (res = re.exec(title_result)){
     console.log(title);
     $.ajax({
         type : "get",
-        url : 'http://111.230.24.37:8000/get?url='+'https://www.xsbiquge.com'+title_url,
+        //url : 'http://111.230.24.37:8000/get?url='+'https://www.xsbiquge.com'+title_url,
+        url : 'https://111.230.24.37:8443/get?url='+'https://www.xsbiquge.com'+title_url,
         async:false,
         success : function(data) {
             let text = content_re.exec(data)[1];
